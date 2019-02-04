@@ -12,6 +12,20 @@
 		<!-- Theme used for syntax highlighting of code -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
 
+		<style>
+			.columns .content-column {
+				max-width: 70%;
+				float: left;
+			}
+			.content-column p,ul,ol {
+				text-align: left;
+			}
+			.columns .illustration-column {
+				max-width: 30%;
+				float: right;
+			}
+		</style>
+
 		<!-- Printing and PDF exports -->
 		<script>
 			var link = document.createElement( 'link' );
@@ -24,33 +38,57 @@
 	<body>
 		<div class="reveal">
 			<div class="slides">
-				<section>
-					<h1>Git Demystified</h1>
-					<h3>Master Git by understanding its basics</h3>
-					<p>
-						<small>Péter Budai</small>
-					</p>
+				<section data-markdown data-separator="^\r?\n---$"
+						 data-separator-vertical="^\r?\n--$"
+						 data-attributes="\^\s*?(\S*.+?)$"
+						 data-element-attributes="<\s*?(\S*.+?)$">
+					<textarea data-template>
+						# Git Demystified
+						
+						### Master Git by understanding its basics
+						
+						Péter Budai
+
+						---
+						## Agenda
+						
+						History and properties
+
+						Anatomy of a repo
+
+						Branching and merging
+
+						Submodules
+
+						Collaboration
+
+						---
+						## Git history
+
+						Created by Linus Torvalds for the Linux kernel source
+
+						Started in 2005, it took him 4 days to get it self-hosted and 2 more months to host Linux
+
+						3 years later, GitHub was launched <!--< class="fragment" data-fragment-index="1" -->
+						
+						Now, it serves 30M+ users, 100M+ repos and 3B+ lines of code <!--< class="fragment" data-fragment-index="1" -->
+
+						--
+						## Git properties
+							
+						* Distributed
+						  * The complete history is present locally
+						
+						* Designed for non-linear workflows <!--< class="fragment" data-fragment-index="1" -->
+						  * Easy branching & merging <!--< class="fragment" data-fragment-index="1" -->
+
+						* Fast and scalable <!--< class="fragment" data-fragment-index="2" -->
+						
+						* Simple, generic-purpose data structure <!--< class="fragment" data-fragment-index="3" -->
+						  * More like a filesystem than a SCM <!--< class="fragment" data-fragment-index="3" -->
+					</textarea>
 				</section>
-				<section>
-					<h2>Agenda</h2>
-					<p>History and properties</p>
-					<p>Anatomy of a repo</p>
-					<p>Branching and merging</p>
-					<p>Submodules</p>
-					<p>Collaboration</p>
-				</section>
-				<section>
-					<section>
-						<h2>Git history</h2>
-						<p>Created by Linus Torvalds for the Linux kernel source code</p>
-						<p>Started in 2005, it took him 4 days to get it self-hosted</p>
-					</section>
-					<section>
-						<h2>Git properties</h2>
-						<p>Distributed VCS<span class="fragment"> - the complete history is present locally</span></p>
-					</section>
-				</section>
-				</div>
+			</div>
 		</div>
 
 		<script src="lib/js/head.min.js"></script>
@@ -61,6 +99,7 @@
 			// - https://github.com/hakimel/reveal.js#configuration
 			// - https://github.com/hakimel/reveal.js#dependencies
 			Reveal.initialize({
+				fragmentInURL: true,
 				dependencies: [
 					{ src: 'plugin/markdown/marked.js' },
 					{ src: 'plugin/markdown/markdown.js' },
