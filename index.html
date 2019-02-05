@@ -20,6 +20,23 @@
 				font-size: 0.7em !important;
 				box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.3)
 			}
+			.reveal section .fragment.step-out {
+				opacity: 1;
+				display: inline;
+				visibility: inherit;
+			}
+			.reveal section .fragment.step-out.visible {
+				opacity: 1;
+				display: none;
+			}
+			.reveal section .fragment.step-in {
+				opacity: 0;
+				display: none;
+			}
+			.reveal section .fragment.step-in.visible {
+				opacity: 1;
+				display: inline;
+			}
 			.columns-50-50 .left-column {
 				max-width: 50%;
 				float: left;
@@ -412,11 +429,81 @@
 						```
 						<!--< data-graphviz="dot" class="center-align" -->
 
-						...to make it easier to navigate between versions:
+						...to make it easier to navigate between versions...
 							
 							$ git checkout constant
 							Switched to branch 'constant'
-			
+
+						---
+						## Working on a branch
+
+						...or to do changes that does not affect other branches.
+
+							$ git checkout constant
+							$ git commit -am "Fixed typo."
+
+						
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+							branch0 [style=invis]
+							branch1 [shape=box; label="Commit\nfaab7c2"]
+							branch2 [style=invis]
+		
+							master [shape=plain]
+							constant [shape=plain; label="constant*"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+							master3 -> branch0 -> branch1 -> branch2 [style=invis]
+							master3 -> branch1 [dir=back]
+
+							master -> master4
+							HEAD -> branch1
+							constant -> branch1
+
+							{rank = same; master1; master2; master3; master4}
+							{rank = same; branch0; branch1; branch2}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-out" data-fragment-index="0" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+							branch0 [style=invis]
+							branch1 [shape=box; label="Commit\nfaab7c2"]
+							branch2 [shape=box; label="Commit\nd5e9466"; style=bold]
+		
+							master [shape=plain]
+							constant [shape=plain; label="constant*"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+							master3 -> branch0 -> branch1 [style=invis]
+							master3 -> branch1 -> branch2 [dir=back]
+
+							master -> master4
+							HEAD -> branch2
+							constant -> branch2
+
+							{rank = same; master1; master2; master3; master4}
+							{rank = same; branch0; branch1; branch2}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-in" data-fragment-index="0" -->
+
+						The current branch (and HEAD) moves along with the new commits. All other refs stay put. <!--< class="fragment" data-fragment-index="0" -->
 						
 						--
 						## HEAD
@@ -431,7 +518,7 @@
 						HEAD is now at fdf4b4d Added README.
 						```
 		
-						Even if no branch points to that commit (detached HEAD).
+						Even if no other branch points to that commit.
 					</textarea>
 				</section>
 			</div>
