@@ -125,6 +125,7 @@
 						## Anatomy of a repo
 						<!--^ class="columns-50-50" -->
 
+						```
 						    .
 						    |-- .git
 							|   |-- config
@@ -134,7 +135,8 @@
 						    |-- .gitignore
 						    |-- README.md
 						    `-- src
-						    	`-- main.py
+								`-- main.py
+						```
 						
 						<!--< class="left-column" -->
 
@@ -242,30 +244,33 @@
 
 						After the first commit
 
-							commit fdf4b4da0d4d388b0276f0fde71b29e6470ec36f (HEAD)
-							Author: Péter Budai <budai@tresorit.com>
-							Date:   Tue Feb 5 15:23:58 2019 +0100
+						```
+						commit fdf4b4da0d4d388b0276f0fde71b29e6470ec36f (HEAD)
+						Author: Péter Budai <budai@tresorit.com>
+						Date:   Tue Feb 5 15:23:58 2019 +0100
 
-								Added README.
-							
-							.
-							|-- .gitignore
-							`-- README.md
-					
+							Added README.
+						
+						.
+						|-- .gitignore
+						`-- README.md
+						```					
 						<!--< class="left-column" -->
 
-						    digraph {
-								bgcolor=transparent;
+						```dot
+						digraph {
+							bgcolor=transparent;
 
-								commit1 [shape=box; label="Commit\nfdf4b4"]
-								root1 [shape=tab; label="/\n129c9f"]
-								gitignore1 [shape=note; label=".gitignore (v1)\ne69de2"]
-								readme [shape=note; label="README.md\ncffb72"]
+							commit1 [shape=box; label="Commit\nfdf4b4"]
+							root1 [shape=tab; label="/\n129c9f"]
+							gitignore1 [shape=note; label=".gitignore (v1)\ne69de2"]
+							readme [shape=note; label="README.md\ncffb72"]
 
-								commit1 -> root1
-								root1 -> gitignore1
-								root1 -> readme
-							}
+							commit1 -> root1
+							root1 -> gitignore1
+							root1 -> readme
+						}
+						```					
 
 						<!--< data-graphviz="dot" class="right-column center-align" -->
 
@@ -275,49 +280,158 @@
 
 						After the second commit
 
-							commit 60eb0d3ad8babf1b082844472fa9c027fc0eb552 (HEAD -> master)
-							Author: Péter Budai <budai@tresorit.com>
-							Date:   Tue Feb 5 16:35:00 2019 +0100
-							
-								Added Hello World.
+						```					
+						commit 60eb0d3ad8babf1b082844472fa9c027fc0eb552 (HEAD -> master)
+						Author: Péter Budai <budai@tresorit.com>
+						Date:   Tue Feb 5 16:35:00 2019 +0100
+						
+							Added Hello World.
 
-						    .
-						    |-- .gitignore
-						    |-- README.md
-						    `-- src
-						    	`-- main.py
+						.
+						|-- .gitignore
+						|-- README.md
+						`-- src
+							`-- main.py
+						```					
 					
 						<!--< class="left-column" -->
 
-						    digraph {
-								bgcolor=transparent;
+						```dot
+						digraph {
+							bgcolor=transparent;
 
-								commit1 [shape=box; label="Commit\nfdf4b4"]
-								root1 [shape=tab; label="/\n129c9f"]
-								gitignore1 [shape=note; label=".gitignore (v1)\ne69de2"]
-								readme [shape=note; label="README.md\ncffb72"]
+							commit1 [shape=box; label="Commit\nfdf4b4"]
+							root1 [shape=tab; label="/\n129c9f"]
+							gitignore1 [shape=note; label=".gitignore (v1)\ne69de2"]
+							readme [shape=note; label="README.md\ncffb72"]
 
-								commit1 -> root1
-								root1 -> gitignore1
-								root1 -> readme
+							commit1 -> root1
+							root1 -> gitignore1
+							root1 -> readme
 
-								commit2 [shape=box; label="Commit\n60eb0d"]
-								root2 [shape=tab; label="/\nf56600"]
-								gitignore2 [shape=note; label=".gitignore (v2)\n43ae0e"]
-								src [shape=tab; label="src\n7a02d5"]
-								mainpy [shape=note; label="main.py\ne33bff"]
+							commit2 [shape=box; label="Commit\n60eb0d"]
+							root2 [shape=tab; label="/\nf56600"]
+							gitignore2 [shape=note; label=".gitignore (v2)\n43ae0e"]
+							src [shape=tab; label="src\n7a02d5"]
+							mainpy [shape=note; label="main.py\ne33bff"]
 
-								commit1 -> commit2 [dir=back]
-								commit2 -> root2
-								root2 -> gitignore2
-								root2 -> readme
-								root2 -> src
-								src -> mainpy
+							commit1 -> commit2 [dir=back]
+							commit2 -> root2
+							root2 -> gitignore2
+							root2 -> readme
+							root2 -> src
+							src -> mainpy
 
-								{rank = same; commit1; commit2}
-							}
+							{rank = same; commit1; commit2}
+						}
+						```					
 
 						<!--< data-graphviz="dot" class="right-column center-align" -->
+
+						---
+						## History
+						<!--^ class="columns-40-60" -->
+
+						Commits form a backward linked, linear history of changes in the repository.
+
+						```bash
+						$ git log --oneline --no-decorate d5e9466
+						d5e9466 Fixed typo.
+						faab7c2 Factored out string constant.
+						74e95f3 Factored print function out
+						60eb0d3 Added Hello World.
+						fdf4b4d Added README.
+
+						$ git log --oneline --no-decorate 631a42b
+						631a42b Pretty-printing
+						74e95f3 Factored print function out
+						60eb0d3 Added Hello World.
+						fdf4b4d Added README.
+						```
+						<!--< class="left-column" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+							branch0 [style=invis]
+							branch1 [shape=box; label="Commit\nfaab7c2"]
+							branch2 [shape=box; label="Commit\nd5e9466"]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+							master3 -> branch0 -> branch1 [style=invis]
+							master3 -> branch1 -> branch2 [dir=back]
+
+							{rank = same; master1; master2; master3; master4}
+							{rank = same; branch0; branch1; branch2}
+						}
+						```
+						<!--< data-graphviz="dot" class="right-column center-align" -->
+
+						It is easy to look up parents and previous states, but not vice-versa.
+						
+						---
+						## Branches
+						<!--^ class="columns-40-60" -->
+
+						We can create meaningful labels pointing to a commit...
+
+							git branch constant
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+							branch0 [style=invis]
+							branch1 [shape=box; label="Commit\nfaab7c2"]
+							branch2 [shape=box; label="Commit\nd5e9466"]
+		
+							master [shape=plain]
+							constant [shape=plain]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+							master3 -> branch0 -> branch1 [style=invis]
+							master3 -> branch1 -> branch2 [dir=back]
+
+							master -> master4
+							HEAD -> master4
+							constant -> branch2
+
+							{rank = same; master1; master2; master3; master4}
+							{rank = same; branch0; branch1; branch2}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align" -->
+
+						...to make it easier to navigate between versions:
+							
+							$ git checkout constant
+							Switched to branch 'constant'
+			
+						
+						--
+						## HEAD
+
+						HEAD is a special reference that always points to the currently checked out commit.
+
+						```
+						$ git checkout fdf4b4
+						You are in 'detached HEAD' state.
+						...
+						
+						HEAD is now at fdf4b4d Added README.
+						```
+		
+						Even if no branch points to that commit (detached HEAD).
 					</textarea>
 				</section>
 			</div>
