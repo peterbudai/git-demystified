@@ -13,16 +13,37 @@
 		<link rel="stylesheet" href="lib/css/zenburn.css">
 
 		<style>
-			.columns .content-column {
-				max-width: 70%;
+			.reveal section pre { 
+				box-shadow: none;
+			}
+			.reveal section pre code {
+				font-size: 0.7em !important;
+				box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.3)
+			}
+			.columns-50-50 .left-column {
+				max-width: 50%;
 				float: left;
 			}
-			.content-column p,ul,ol {
-				text-align: left;
-			}
-			.columns .illustration-column {
-				max-width: 30%;
+			.columns-50-50 .right-column {
+				max-width: 50%;
 				float: right;
+			}
+			.columns-40-60 .left-column {
+				max-width: 40%;
+				float: left;
+			}
+			.columns-40-60 .right-column {
+				max-width: 60%;
+				float: right;
+			}
+			.left-align {
+				text-align: left !important;
+			}
+			.right-align {
+				text-align: right !important;
+			}
+			.center-align {
+				text-align: center !important;
 			}
 		</style>
 
@@ -73,19 +94,230 @@
 						
 						Now, it serves 30M+ users, 100M+ repos and 3B+ lines of code <!--< class="fragment" data-fragment-index="1" -->
 
-						--
+						---
 						## Git properties
 							
 						* Distributed
 						  * The complete history is present locally
 						
-						* Designed for non-linear workflows <!--< class="fragment" data-fragment-index="1" -->
-						  * Easy branching & merging <!--< class="fragment" data-fragment-index="1" -->
+						* Designed for non-linear workflows
+						  * Easy branching & merging
 
-						* Fast and scalable <!--< class="fragment" data-fragment-index="2" -->
+						* Fast and scalable
 						
-						* Simple, generic-purpose data structure <!--< class="fragment" data-fragment-index="3" -->
-						  * More like a filesystem than a SCM <!--< class="fragment" data-fragment-index="3" -->
+						* Simple, generic-purpose data structure
+						  * More like a filesystem than a SCM
+
+						---
+						## Creating a repo
+
+						New, empty repository
+
+							git init demo-repo
+							
+						Obtain an existing repository
+
+							git clone git@github.com:peterbudai/demo-repo.git
+
+						The created repository is a complete, standalone entity. From now on, all operations are local.
+						
+						---
+						## Anatomy of a repo
+						<!--^ class="columns-50-50" -->
+
+						    .
+						    |-- .git
+							|   |-- config
+							|   |-- ...
+						    |   |-- objects
+						    |   `-- refs
+						    |-- .gitignore
+						    |-- README.md
+						    `-- src
+						    	`-- main.py
+						
+						<!--< class="left-column" -->
+
+						* Repository
+						  * Local configuration
+						  * Object database
+						  * Refs
+						* Working directory
+
+						---
+						##  Working with files
+						<!--^ class="columns-50-50" -->
+
+						![Three states](https://book.git-scm.com/book/en/v2/images/areas.png) <!--< class="left-column" -->
+
+						In the working directory, files can be either:
+						* Tracked 
+						  * Unchanged
+						  * Modified or deleted
+						* Staged
+						  * Modified or deleted
+						* Untracked
+						  * Ignored
+						
+						---
+						## Commiting
+
+						Recording the changes in the working directory as new version and stores it in the repository.
+
+						One-step _(will not add untracked files!)_
+
+							git commit -a -m "Commit message"
+							
+						Using staging area
+
+							git add [-A]
+							git add ...
+							git commit -m "Commit message"
+						
+						Commiting always takes a whole "snapshot" of the current file structure, not just records the changes.
+
+						---
+						## Repository
+
+						Object database
+						* content-addressable, append-only database
+						* stores files, directories, commits, tags
+						  * each version is a different object, stored as a whole
+						* they may contain pointers to others by their address
+						
+						References and tags
+						* named pointers to commit objects
+						* simple text files storing object addresses
+
+						---
+						## Object addresses
+
+						SHA1 hash of the contents. 
+
+						For files
+
+							$ echo -e "blob $(cat README.md | tr -d '\r' | wc -c)\x00$(cat README.md | tr -d '\r')" | sha1sum
+							cffb72bf4f310e052924dca85235d03aebf479e6 *-
+
+							$ openssl zlib -d -in .git/objects/cf/fb72bf4f310e052924dca85235d03aebf479e6
+
+						Even the slightest change will result in a different SHA1 hash, thus a different object.
+						
+						--
+						## Object addresses
+
+						SHA1 hash of the contents. 
+
+						For directories:
+
+							$ git cat-file -p f56600
+							100644 blob 43ae0e2a6c6d8fca34872506ca0f2e64194fec7c    .gitignore
+							100644 blob cffb72bf4f310e052924dca85235d03aebf479e6    README.md
+							040000 tree 7a02d51d8835b74b82d008e0273e6de31e819515    src
+
+						Will change if an item is added, removed or its content or permissions change (recursively).
+						
+						--
+						## Object addresses
+
+						SHA1 hash of the contents. 
+						
+						For commits:
+
+							$ git cat-file -p 60eb0d
+							tree f566009872bdd562f7c76e4220eeb1ae7b2406fd
+							parent fdf4b4da0d4d388b0276f0fde71b29e6470ec36f
+							author Péter Budai <budai@tresorit.com> 1549380900 +0100
+							committer Péter Budai <budai@tresorit.com> 1549383923 +0100
+							
+							Added Hello World.
+
+						If any content changes (even the commit message!), it will result in a different commit object.
+						
+						_One cannot change an already commited version!_
+
+						---
+						## Working tree snapshots
+						<!--^ class="columns-50-50" -->
+
+						After the first commit
+
+							commit fdf4b4da0d4d388b0276f0fde71b29e6470ec36f (HEAD)
+							Author: Péter Budai <budai@tresorit.com>
+							Date:   Tue Feb 5 15:23:58 2019 +0100
+
+								Added README.
+							
+							.
+							|-- .gitignore
+							`-- README.md
+					
+						<!--< class="left-column" -->
+
+						    digraph {
+								bgcolor=transparent;
+
+								commit1 [shape=box; label="Commit\nfdf4b4"]
+								root1 [shape=tab; label="/\n129c9f"]
+								gitignore1 [shape=note; label=".gitignore (v1)\ne69de2"]
+								readme [shape=note; label="README.md\ncffb72"]
+
+								commit1 -> root1
+								root1 -> gitignore1
+								root1 -> readme
+							}
+
+						<!--< data-graphviz="dot" class="right-column center-align" -->
+
+						--
+						## Working tree snapshots
+						<!--^ class="columns-40-60" -->
+
+						After the second commit
+
+							commit 60eb0d3ad8babf1b082844472fa9c027fc0eb552 (HEAD -> master)
+							Author: Péter Budai <budai@tresorit.com>
+							Date:   Tue Feb 5 16:35:00 2019 +0100
+							
+								Added Hello World.
+
+						    .
+						    |-- .gitignore
+						    |-- README.md
+						    `-- src
+						    	`-- main.py
+					
+						<!--< class="left-column" -->
+
+						    digraph {
+								bgcolor=transparent;
+
+								commit1 [shape=box; label="Commit\nfdf4b4"]
+								root1 [shape=tab; label="/\n129c9f"]
+								gitignore1 [shape=note; label=".gitignore (v1)\ne69de2"]
+								readme [shape=note; label="README.md\ncffb72"]
+
+								commit1 -> root1
+								root1 -> gitignore1
+								root1 -> readme
+
+								commit2 [shape=box; label="Commit\n60eb0d"]
+								root2 [shape=tab; label="/\nf56600"]
+								gitignore2 [shape=note; label=".gitignore (v2)\n43ae0e"]
+								src [shape=tab; label="src\n7a02d5"]
+								mainpy [shape=note; label="main.py\ne33bff"]
+
+								commit1 -> commit2 [dir=back]
+								commit2 -> root2
+								root2 -> gitignore2
+								root2 -> readme
+								root2 -> src
+								src -> mainpy
+
+								{rank = same; commit1; commit2}
+							}
+
+						<!--< data-graphviz="dot" class="right-column center-align" -->
 					</textarea>
 				</section>
 			</div>
@@ -99,7 +331,7 @@
 			// - https://github.com/hakimel/reveal.js#configuration
 			// - https://github.com/hakimel/reveal.js#dependencies
 			Reveal.initialize({
-				fragmentInURL: true,
+				history: true,
 				dependencies: [
 					{ src: 'plugin/markdown/marked.js' },
 					{ src: 'plugin/markdown/markdown.js' },
