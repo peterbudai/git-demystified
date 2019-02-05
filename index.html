@@ -12,57 +12,8 @@
 		<!-- Theme used for syntax highlighting of code -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
 
-		<style>
-			.reveal section pre { 
-				box-shadow: none;
-			}
-			.reveal section pre code {
-				font-size: 0.7em !important;
-				box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.3)
-			}
-			.reveal section .fragment.step-out {
-				opacity: 1;
-				display: inline;
-				visibility: inherit;
-			}
-			.reveal section .fragment.step-out.visible {
-				opacity: 1;
-				display: none;
-			}
-			.reveal section .fragment.step-in {
-				opacity: 0;
-				display: none;
-			}
-			.reveal section .fragment.step-in.visible {
-				opacity: 1;
-				display: inline;
-			}
-			.columns-50-50 .left-column {
-				max-width: 50%;
-				float: left;
-			}
-			.columns-50-50 .right-column {
-				max-width: 50%;
-				float: right;
-			}
-			.columns-40-60 .left-column {
-				max-width: 40%;
-				float: left;
-			}
-			.columns-40-60 .right-column {
-				max-width: 60%;
-				float: right;
-			}
-			.left-align {
-				text-align: left !important;
-			}
-			.right-align {
-				text-align: right !important;
-			}
-			.center-align {
-				text-align: center !important;
-			}
-		</style>
+		<!-- My customizations -->
+		<link rel="stylesheet" href="css/custom.css">
 
 		<!-- Printing and PDF exports -->
 		<script>
@@ -533,6 +484,7 @@
 			// - https://github.com/hakimel/reveal.js#dependencies
 			Reveal.initialize({
 				history: true,
+				pdfSeparateFragments: false,
 				dependencies: [
 					{ src: 'plugin/markdown/marked.js' },
 					{ src: 'plugin/markdown/markdown.js' },
@@ -541,6 +493,7 @@
 					{ src: 'plugin/reveal-viz/viz.js' },
 					{ src: 'plugin/reveal-viz/lite.render.js' },
 					{ src: 'plugin/reveal-viz/reveal-viz.js' },
+					{ src: 'plugin/print-pdf/print-pdf.js', async: true },
 				]
 			});
 		</script>
