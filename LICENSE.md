@@ -1,4 +1,4 @@
-Copyright (C) 2019 Péter Budai, Hakim El Hattab, and reveal.js contributors
+Copyright (C) 2019 Péter Budai, https://peterbudai.eu/
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
