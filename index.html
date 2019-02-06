@@ -47,7 +47,7 @@
 
 						[Branching and merging](#/branches)
 
-						Collaboration
+						[Collaboration](#/remotes)
 
 						[Submodules](#/submodules)
 
@@ -301,23 +301,38 @@
 						## Commit history
 						<!--^ class="columns-40-60" -->
 
-						Commits form a backward linked, linear history of changes in the repository.
+						Commits form a backward linked, linear history of the changes in the repository.
 
 						```bash
-						$ git log --oneline --no-decorate d5e9466
+						$ git log --oneline d5e9466
 						d5e9466 Fixed typo.
 						faab7c2 Factored out string constant.
 						74e95f3 Factored print function out
 						60eb0d3 Added Hello World.
 						fdf4b4d Added README.
 
-						$ git log --oneline --no-decorate 631a42b
+						$ git log --oneline 631a42b
 						631a42b Pretty-printing
 						74e95f3 Factored print function out
 						60eb0d3 Added Hello World.
 						fdf4b4d Added README.
 						```
-						<!--< class="left-column" -->
+						<!--< class="left-column fragment step-out" data-fragment-index="0" -->
+
+						```bash
+						$ git config --global alias.graph \
+						  log --oneline --decorate --graph
+
+						$ git graph --all
+						* d5e9466 Fixed typo.
+						* faab7c2 Factored out string constant.
+						| * 631a42b Pretty-printing
+						|/
+						* 74e95f3 Factored print function out
+						* 60eb0d3 Added Hello World.
+						* fdf4b4d Added README.
+						```
+						<!--< class="left-column fragment step-in" data-fragment-index="0" -->
 
 						```dot
 						digraph {
@@ -603,7 +618,598 @@
 						```
 						<!--< data-graphviz="dot" class="center-align fragment step-in" data-fragment-index="2" -->
 
-						GC removes all objects that no other object or ref points to! <!--< class="fragment" data-fragment-index="2" -->
+						_GC removes all objects that no other object or ref points to!_ <!--< class="fragment" data-fragment-index="2" -->
+
+						---
+						## Tags
+
+						Tags are just immutable, append-only branches, to label a specific point in the history.
+
+						```
+						git tag v1.0
+						```
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+		
+							master [shape=plain; label="master*"]
+							tag1 [shape=underline; label="v1.0"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+
+							master -> master4
+							HEAD -> master4
+							tag1 -> master3
+
+							{rank = same; master1; master2; master3; master4}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align" -->
+
+						--
+						## Annotated tags
+
+						They can carry some metadata (eg. description or a digital signature)
+
+						```
+						git tag -a v0.8 -m "Beta release"
+						```
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+		
+							master [shape=plain; label="master*"]
+							tag1 [shape=underline; label="v0.8"]
+							tag2 [shape=note; label="Tag\ne073b7"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+
+							master -> master4
+							HEAD -> master4
+							tag1 -> tag2 -> master3;
+
+							{rank = same; master1; master2; master3; master4}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align" -->
+
+						---
+						## Merging
+
+						---
+						## Rebasing
+
+						---
+						## Remotes
+						<!--^ id="remotes" -->
+
+						A _remote_ is a link to another copy of the repository
+						
+						* on another disk volume,
+						* on a network share or a remote computer,
+						* on a Git hosting service (like GitHub).
+
+						Set a new remote named `backup`
+
+						```
+						git remote add backup file:///mnt/nas/demo-repo.git
+						```
+							
+						Cloning automatically sets the source as `origin`
+
+						```
+						git clone git@github.com:peterbudai/demo-repo.git
+						```
+
+						---
+						## Synchronizing between repos
+
+						Synchronizing is simply done by exchanging the missing objects and updating references.
+						* The connections between objects will automatically be restored after all objects arrived
+
+						Receiving changes from a remote
+
+							git fetch origin
+							
+						Sending changes to a remote (branch)
+
+						    git push backup master:master
+
+						---
+						## fetch
+
+						Fetch does not change anything in the working copy, just updates the database.
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+							branch0 [style=invis]
+							branch1 [shape=box; label="Commit\nfaab7c2"]
+							branch2 [style=invis]
+		
+							master [shape=plain]
+							rmaster [shape=plain; label="origin/master"]
+							constant [shape=plain; label="constant*"]
+							rconstant [shape=plain; label="origin/constant"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+							master3 -> branch0 -> branch1 -> branch2 [style=invis]
+							master3 -> branch1 [dir=back]
+
+							master -> master4
+							rmaster -> master4
+							HEAD -> branch1
+							constant -> branch1
+							rconstant -> branch1
+
+							{rank = same; master1; master2; master3; master4}
+							{rank = same; branch0; branch1; branch2}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-out" data-fragment-index="0" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+							branch0 [style=invis]
+							branch1 [shape=box; label="Commit\nfaab7c2"]
+							branch2 [shape=box; label="Commit\nd5e9466"]
+		
+							master [shape=plain]
+							rmaster [shape=plain; label="origin/master"]
+							constant [shape=plain; label="constant*"]
+							rconstant [shape=plain; label="origin/constant"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+							master3 -> branch0 -> branch1 [style=invis]
+							master3 -> branch1 -> branch2 [dir=back]
+
+							master -> master4
+							rmaster -> master4
+							HEAD -> branch1
+							constant -> branch1
+							rconstant -> branch2
+
+							{rank = same; master1; master2; master3; master4}
+							{rank = same; branch0; branch1; branch2}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-in" data-fragment-index="0" -->
+
+						Remote references are kept separately in the local database.
+
+						---
+						## Tracking branches
+
+						You can "connect" a local branch to a remote branch. Git will try to update the other end during pull and push.
+
+							git branch -u origin/constant
+
+						or
+
+							git push -u origin master
+
+						
+						---
+						## Pull
+
+							git fetch && git rebase origin/master
+							
+						In a simple case it just updates the references
+						
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [style=invis]
+		
+							master [shape=plain; label="master*"]
+							rmaster [shape=plain; label="origin/master"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 [dir=back]
+
+							master -> master3
+							rmaster -> master3
+							HEAD -> master3
+
+							{rank = same; master1; master2; master3; master4}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-out" data-fragment-index="0" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+		
+							master [shape=plain; label="master*"]
+							rmaster [shape=plain; label="origin/master"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+
+							master -> master3
+							rmaster -> master4
+							HEAD -> master3
+
+							{rank = same; master1; master2; master3; master4}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-in-and-out" data-fragment-index="0" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+		
+							master [shape=plain; label="master*"]
+							rmaster [shape=plain; label="origin/master"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+
+							master -> master4
+							rmaster -> master4
+							HEAD -> master4
+
+							{rank = same; master1; master2; master3; master4}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-in" data-fragment-index="1" -->
+
+						---
+						## Pull
+
+							git fetch && git rebase origin/master
+							
+						If there were local changes, the local and remote branch need to be merged
+						
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+							branch0 [style=invis]
+							branch1 [style=invis]
+							branch2 [style=invis]
+		
+							master [shape=plain; label="master*"]
+							rmaster [shape=plain; label="origin/master"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+							master3 -> branch0 -> branch1 -> branch2 [style=invis]
+
+							master -> master4
+							rmaster -> master3
+							HEAD -> master4
+
+							{rank = same; master1; master2; master3; master4}
+							{rank = same; branch0; branch1; branch2}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-out" data-fragment-index="0" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+							branch0 [style=invis]
+							branch1 [shape=box; label="Commit\nfaab7c2"]
+							branch2 [shape=box; label="Commit\nd5e9466"]
+		
+							master [shape=plain; label="master*"]
+							rmaster [shape=plain; label="origin/master"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+							master3 -> branch0 -> branch1 [style=invis]
+							master3 -> branch1 -> branch2 [dir=back]
+
+							master -> master4
+							rmaster -> branch2
+							HEAD -> master4
+
+							{rank = same; master1; master2; master3; master4}
+							{rank = same; branch0; branch1; branch2}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-in-and-out" data-fragment-index="0" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"; style=dashed]
+							branch0 [style=invis]
+							branch1 [shape=box; label="Commit\nfaab7c2"]
+							branch2 [shape=box; label="Commit\nd5e9466"]
+		
+							master [shape=plain; label="master*"]
+							rmaster [shape=plain; label="origin/master"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+							master3 -> branch0 -> branch1 [style=invis]
+							master3 -> branch1 -> branch2 [dir=back]
+
+							master -> master4
+							rmaster -> branch2
+							HEAD -> master4
+
+							{rank = same; master1; master2; master3; master4}
+							{rank = same; branch0; branch1; branch2}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-in-and-out" data-fragment-index="1" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n9eae16b"; style=bold]
+							branch0 [style=invis]
+							branch1 [shape=box; label="Commit\nfaab7c2"]
+							branch2 [shape=box; label="Commit\nd5e9466"]
+		
+							master [shape=plain; label="master*"]
+							rmaster [shape=plain; label="origin/master"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> branch1 -> branch2 -> master4 [dir=back]
+							master3 -> branch0 -> branch1 [style=invis]
+
+							master -> master4
+							rmaster -> branch2
+							HEAD -> master4
+
+							{rank = same; master1; master2; master3; master4}
+							{rank = same; branch0; branch1; branch2}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-in-and-out" data-fragment-index="2" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n9eae16b"]
+							branch1 [shape=box; label="Commit\nfaab7c2"]
+							branch2 [shape=box; label="Commit\nd5e9466"]
+		
+							master [shape=plain; label="master*"]
+							rmaster [shape=plain; label="origin/master"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> branch1 -> branch2 -> master4 [dir=back]
+
+							master -> master4
+							rmaster -> branch2
+							HEAD -> master4
+
+							{rank = same; master1; master2; master3; master4; branch1; branch2}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-in" data-fragment-index="3" -->
+
+						---
+						## Push
+
+						Unlike to fetch, it sends only the objects relevant to the tracking branch.
+
+							git push
+							
+						In a simple case it just updates the references.
+						
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+		
+							master [shape=plain; label="master*"]
+							rmaster [shape=plain; label="origin/master"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+
+							master -> master4
+							rmaster -> master3
+							HEAD -> master4
+
+							{rank = same; master1; master2; master3; master4}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-out" data-fragment-index="0" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+		
+							master [shape=plain; label="master*"]
+							rmaster [shape=plain; label="origin/master"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+
+							master -> master4
+							rmaster -> master4
+							HEAD -> master4
+
+							{rank = same; master1; master2; master3; master4}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-in" data-fragment-index="0" -->
+
+						---
+						## Push conflict
+
+						If there were changes at both side, the push will be rejected
+
+							$ git push
+							! [rejected]        master -> master (non-fast forward)
+							error: failed to push some refs to 'git@github.com:peterbudai/demo-repo.git
+
+						You need to resolve the situation locally first and push again
+
+							$ git pull
+							$ git push
+
+						---
+						## Force push
+
+						```
+							git push -f
+						```
+
+						It should be avoided if possible, as it may result in diverging histories if the deleted commits were already fetched by others.
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+							branch0 [style=invis]
+							branch1 [shape=box; label="Commit\nfaab7c2"]
+							branch2 [shape=box; label="Commit\nd5e9466"]
+		
+							master [shape=plain; label="master*"]
+							rmaster [shape=plain; label="origin/master"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+							master3 -> branch0 -> branch1 [style=invis]
+							master3 -> branch1 -> branch2 [dir=back]
+
+							master -> branch2
+							rmaster -> master4
+							HEAD -> branch2
+
+							{rank = same; master1; master2; master3; master4}
+							{rank = same; branch0; branch1; branch2}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-out" data-fragment-index="0" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"; style=dashed]
+							branch0 [style=invis]
+							branch1 [shape=box; label="Commit\nfaab7c2"]
+							branch2 [shape=box; label="Commit\nd5e9466"]
+		
+							master [shape=plain; label="master*"]
+							rmaster [shape=plain; label="origin/master"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+							master3 -> branch0 -> branch1 [style=invis]
+							master3 -> branch1 -> branch2 [dir=back]
+
+							master -> branch2
+							rmaster -> branch2
+							HEAD -> branch2
+
+							{rank = same; master1; master2; master3; master4}
+							{rank = same; branch0; branch1; branch2}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-in-and-out" data-fragment-index="0" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							branch1 [shape=box; label="Commit\nfaab7c2"]
+							branch2 [shape=box; label="Commit\nd5e9466"]
+		
+							master [shape=plain; label="master*"]
+							rmaster [shape=plain; label="origin/master"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> branch1 -> branch2 [dir=back]
+
+							master -> branch2
+							rmaster -> branch2
+							HEAD -> branch2
+
+							{rank = same; master1; master2; master3; branch1; branch2}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-in" data-fragment-index="1" -->
 
 						---
 						## Submodules
@@ -613,8 +1219,6 @@
 
 						```dot
 						digraph {
-							bgcolor=transparent
-
 							subgraph cluster2 {
 								label="Submodule"; labeljust=l
 
@@ -639,6 +1243,8 @@
 								root1 -> lib1
 								lib1 -> sub2
 							}
+
+							bgcolor=transparent;
 						}
 						```					
 						<!--< data-graphviz="dot" class="center-align right-column" -->
