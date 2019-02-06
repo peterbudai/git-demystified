@@ -27,6 +27,15 @@
     opacity: 1;
     display: inline;
 }
+.reveal section .fragment.step-in-and-out {
+    opacity: 0;
+    display: none;
+}
+.reveal section .fragment.step-in-and-out.visible.current-fragment {
+    opacity: 1;
+    display: inline;
+}
+
 
 /* Two column view */
 

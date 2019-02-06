@@ -47,9 +47,9 @@
 
 						[Branching and merging](#/branches)
 
-						Submodules
-
 						Collaboration
+
+						[Submodules](#/submodules)
 
 						---
 						<!--^ id="history" -->
@@ -232,7 +232,7 @@
 							bgcolor=transparent;
 
 							commit1 [shape=box; label="Commit\nfdf4b4"]
-							root1 [shape=tab; label="/\n129c9f"]
+							root1 [shape=folder; label="/\n129c9f"]
 							gitignore1 [shape=note; label=".gitignore (v1)\ne69de2"]
 							readme [shape=note; label="README.md\ncffb72"]
 
@@ -241,7 +241,6 @@
 							root1 -> readme
 						}
 						```					
-
 						<!--< data-graphviz="dot" class="right-column center-align" -->
 
 						--
@@ -271,7 +270,7 @@
 							bgcolor=transparent;
 
 							commit1 [shape=box; label="Commit\nfdf4b4"]
-							root1 [shape=tab; label="/\n129c9f"]
+							root1 [shape=folder; label="/\n129c9f"]
 							gitignore1 [shape=note; label=".gitignore (v1)\ne69de2"]
 							readme [shape=note; label="README.md\ncffb72"]
 
@@ -280,9 +279,9 @@
 							root1 -> readme
 
 							commit2 [shape=box; label="Commit\n60eb0d"]
-							root2 [shape=tab; label="/\nf56600"]
+							root2 [shape=folder; label="/\nf56600"]
 							gitignore2 [shape=note; label=".gitignore (v2)\n43ae0e"]
-							src [shape=tab; label="src\n7a02d5"]
+							src [shape=folder; label="src\n7a02d5"]
 							mainpy [shape=note; label="main.py\ne33bff"]
 
 							commit1 -> commit2 [dir=back]
@@ -458,7 +457,7 @@
 
 						The current branch (and HEAD) moves along with the new commits. All other refs stay put. <!--< class="fragment" data-fragment-index="0" -->
 						
-						--
+						---
 						## HEAD
 
 						HEAD is a special reference that always points to the currently checked out commit.
@@ -472,6 +471,321 @@
 						```
 		
 						Even if no other branch points to that commit.
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+		
+							master [shape=plain]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+
+							master -> master4
+							HEAD -> master3
+
+							{rank = same; master1; master2; master3; master4}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align" -->
+
+						--
+						## Detached HEAD
+
+						Be cautious with detached HEAD.
+
+						```
+						$ git commit -m "..."
+						$ git checkout master
+						$ git gc
+						```
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+		
+							master [shape=plain]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+
+							master -> master4
+							HEAD -> master3
+
+							{rank = same; master1; master2; master3; master4}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-out" data-fragment-index="0" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+							branch0 [style=invis]
+							branch1 [shape=box; label="Commit\nfaab7c2"; style=bold]
+		
+							master [shape=plain]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+							master3 -> branch0 -> branch1 [style=invis]
+							master3 -> branch1 [dir=back]
+
+							master -> master4
+							HEAD -> branch1
+
+							{rank = same; master1; master2; master3; master4}
+							{rank = same; branch0; branch1}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-in-and-out" data-fragment-index="0" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+							branch0 [style=invis]
+							branch1 [shape=box; label="Commit\nfaab7c2"; style=dashed]
+		
+							master [shape=plain; label="master*"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+							master3 -> branch0 -> branch1 [style=invis]
+							master3 -> branch1 [dir=back]
+
+							master -> master4
+							HEAD -> master4
+
+							{rank = same; master1; master2; master3; master4}
+							{rank = same; branch0; branch1}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-in-and-out" data-fragment-index="1" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+		
+							master [shape=plain; label="master*"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+
+							master -> master4
+							HEAD -> master4
+
+							{rank = same; master1; master2; master3; master4}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-in" data-fragment-index="2" -->
+
+						GC removes all objects that no other object or ref points to! <!--< class="fragment" data-fragment-index="2" -->
+
+						---
+						## Submodules
+						<!--^ class="columns-40-60" id="submodules" -->
+
+						For "mounting" the contents of another repository under a subfolder. <!--< class="left-column" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent
+
+							subgraph cluster2 {
+								label="Submodule"; labeljust=l
+
+								sub1 [shape=box; label="Commit\ncf83e13"]
+								sub2 [shape=box; label="Commit\n8fc1c14"]
+								sub3 [shape=box; label="Commit\n50b5715"]
+								sub1 -> sub2 -> sub3 [dir=back]
+
+								{rank=same; sub1; sub2; sub3}
+							}
+
+							subgraph cluster1 {
+								label="Main repo"; labeljust=l
+
+								commit1 [shape=box; label="Commit\nfdf4b4"]
+								root1 [shape=folder; label="/\n129c9f"]
+								readme1 [shape=note; label="README.md (v1)\ncffb72"]
+								lib1 [shape=cds; label="lib\n8fc1c14"]
+	
+								commit1 -> root1
+								root1 -> readme1
+								root1 -> lib1
+								lib1 -> sub2
+							}
+						}
+						```					
+						<!--< data-graphviz="dot" class="center-align right-column" -->
+
+						---
+						## Updating a submodule
+
+						It always points to a given commit of the other repo.
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							subgraph cluster2 {
+								label="Submodule"; labeljust=l
+
+								sub1 [shape=box; label="Commit\ncf83e13"]
+								sub2 [shape=box; label="Commit\n8fc1c14"]
+								sub3 [shape=box; label="Commit\n50b5715"]
+								sub1 -> sub2 -> sub3 [dir=back]
+
+								{rank=same; sub1; sub2; sub3}
+							}
+
+							subgraph cluster1 {
+								label="Main repo"; labeljust=l
+
+								commit1 [shape=box; label="Commit\nfdf4b4"]
+								root1 [shape=folder; label="/\n129c9f"]
+								readme1 [shape=note; label="README.md (v1)\ncffb72"]
+								lib1 [shape=cds; label="lib\n8fc1c14"]
+	
+								commit1 -> root1
+								root1 -> readme1
+								root1 -> lib1
+								lib1 -> sub2
+							}
+						}
+						```					
+						<!--< data-graphviz="dot" class="center-align fragment step-out" data-fragment-index="0" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							subgraph cluster2 {
+								label="Submodule"; labeljust=l
+
+								sub1 [shape=box; label="Commit\ncf83e13"]
+								sub2 [shape=box; label="Commit\n8fc1c14"]
+								sub3 [shape=box; label="Commit\n50b5715"]
+								sub1 -> sub2 -> sub3 [dir=back]
+
+								{rank=same; sub1; sub2; sub3}
+							}
+
+							subgraph cluster1 {
+								label="Main repo"; labeljust=l
+
+								commit1 [shape=box; label="Commit\nfdf4b4"]
+								root1 [shape=folder; label="/\n129c9f"]
+								readme1 [shape=note; label="README.md (v1)\ncffb72"]
+								lib1 [shape=cds; label="lib\n8fc1c14"]
+	
+								commit1 -> root1
+								root1 -> readme1
+								root1 -> lib1
+								lib1 -> sub2
+	
+								commit2 [shape=box; label="Commit\nfdf4b4"]
+								root2 [shape=folder; label="/\n8c66b2"]
+								readme2 [shape=note; label="README.md (v2)\n39aa14"]
+	
+								commit1 -> commit2 [dir=back]
+								commit2 -> root2
+								root2 -> readme2
+								root2 -> lib1
+
+								{rank=same; commit1; commit2}
+							}
+						}
+						```					
+						<!--< data-graphviz="dot" class="center-align fragment step-in-and-out" data-fragment-index="0" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							subgraph cluster2 {
+								label="Submodule"; labeljust=l
+
+								sub1 [shape=box; label="Commit\ncf83e13"]
+								sub2 [shape=box; label="Commit\n8fc1c14"]
+								sub3 [shape=box; label="Commit\n50b5715"]
+								sub1 -> sub2 -> sub3 [dir=back]
+
+								{rank=same; sub1; sub2; sub3}
+							}
+
+							subgraph cluster1 {
+								label="Main repo"; labeljust=l
+								
+								commit1 [shape=box; label="Commit\nfdf4b4"]
+								root1 [shape=folder; label="/\n129c9f"]
+								readme1 [shape=note; label="README.md (v1)\ncffb72"]
+								lib1 [shape=cds; label="lib\n8fc1c14"]
+	
+								commit1 -> root1
+								root1 -> readme1
+								root1 -> lib1
+								lib1 -> sub2
+	
+								commit2 [shape=box; label="Commit\nfdf4b4"]
+								root2 [shape=folder; label="/\n8c66b2"]
+								readme2 [shape=note; label="README.md (v2)\n39aa14"]
+	
+								commit2 -> root2
+								root2 -> readme2
+								root2 -> lib1
+
+								commit3 [shape=box; label="Commit\n4050b5"]
+								root3 [shape=folder; label="/\n495991"]
+								lib2 [shape=cds; label="lib\n50b5715"]
+
+								commit3 -> root3
+								root3 -> readme2
+								root3 -> lib2
+								lib2 -> sub3
+
+								commit1 -> commit2 -> commit3 [dir=back]
+
+								{rank=same; commit1; commit2; commit3}
+							}
+						}
+						```					
+						<!--< data-graphviz="dot" class="center-align fragment step-in" data-fragment-index="1" -->
+
+						---
+						## References
+
+						[Pro Git](https://git-scm.com/book/en/v2) book by Scott Chacon and Ben Straub (free)
+
+						---
+						# Q&A
+
+						---
+						# Thank you
 					</textarea>
 				</section>
 			</div>
@@ -486,7 +800,6 @@
 			// - https://github.com/hakimel/reveal.js#dependencies
 			Reveal.initialize({
 				history: true,
-				pdfSeparateFragments: false,
 				dependencies: [
 					{ src: 'plugin/markdown/marked.js' },
 					{ src: 'plugin/markdown/markdown.js' },
