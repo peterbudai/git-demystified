@@ -688,10 +688,378 @@
 						<!--< data-graphviz="dot" class="center-align" -->
 
 						---
-						## Merging
+						## Merging in general
+
+						Diverging changes on different branches need to be unified eventually.
+						
+						The end result is always a commit that contains changes from both sides, but
+						we have two options of how we achieve it: _merging_ or _rebasing_
+
+						Either way, Git usually does a quite good job on finding the middle ground,
+						and we only need to resolve _merge conflicts_ when both sides changed the
+						exact same lines.
 
 						---
-						## Rebasing
+						## Merge operation
+
+						    git merge master
+						
+						Will create a new _merge commit_ on the current branch, with both parents
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+							branch1 [shape=box; label="Commit\nfaab7c2"]
+							branch2 [shape=box; label="Commit\nd5e9466"]
+		
+							master [shape=plain]
+							constant [shape=plain; label="constant*"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+							master3 -> branch1 -> branch2 [dir=back]
+
+							master -> master4
+							HEAD -> branch2
+							constant -> branch2
+
+							{rank = same; master1; master2; master3; master4}
+							{rank = same; branch1; branch2}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-out" data-fragment-index="0" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+							branch0 [style=invis]
+							branch1 [shape=box; label="Commit\nfaab7c2"]
+							branch2 [shape=box; label="Commit\nd5e9466"]
+							branch3 [shape=box; label="Commit\n8c31cb7"; style=bold]
+		
+							master [shape=plain]
+							constant [shape=plain, label="constant*"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 -> branch3 [dir=back]
+							master3 -> branch0 -> branch1 [style=invis]
+							master3 -> branch1 -> branch2 -> branch3 [dir=back]
+
+							master -> master4
+							HEAD -> branch3
+							constant -> branch3
+
+							{rank = same; master1; master2; master3; master4}
+							{rank = same; branch0; branch1; branch2; branch3}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-in-and-out" data-fragment-index="0" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+							branch0 [style=invis]
+							branch1 [shape=box; label="Commit\nfaab7c2"]
+							branch2 [shape=box; label="Commit\nd5e9466"]
+							branch3 [shape=box; label="Commit\n8c31cb7"]
+							branch4 [shape=box; label="Commit\nb3199dd"; style=bold]
+		
+							master [shape=plain]
+							constant [shape=plain, label="constant*"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 -> branch3 [dir=back]
+							master3 -> branch0 -> branch1 [style=invis]
+							master3 -> branch1 -> branch2 -> branch3 -> branch4 [dir=back]
+
+							master -> master4
+							HEAD -> branch4
+							constant -> branch4
+
+							{rank = same; master1; master2; master3; master4}
+							{rank = same; branch0; branch1; branch2; branch3; branch4}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-in" data-fragment-index="1" -->
+
+						---
+						## Rebase operation
+
+							git rebase master
+						
+						Will _recreate_ all commits _one-by-one_ as they would be authored on top of the other branch.
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+							branch0 [style=invis]
+							branch1 [shape=box; label="Commit\nfaab7c2"]
+							branch2 [shape=box; label="Commit\nd5e9466"]
+		
+							master [shape=plain]
+							constant [shape=plain; label="constant*"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 [dir=back]
+							master3 -> branch0 -> branch1 [style=invis]
+							master3 -> branch1 -> branch2 [dir=back]
+
+							master -> master4
+							HEAD -> branch2
+							constant -> branch2
+
+							{rank = same; master1; master2; master3; master4}
+							{rank = same; branch0; branch1; branch2}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-out" data-fragment-index="0" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+							branch0 [style=invis]
+							branch1 [shape=box; label="Commit\nfaab7c2"; style=dashed]
+							branch2 [shape=box; label="Commit\nd5e9466"]
+							rebase1 [shape=box; label="Commit\n7bc489a"; style=bold]
+		
+							master [shape=plain]
+							constant [shape=plain; label="constant*"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 -> rebase1 [dir=back]
+							master3 -> branch0 -> branch1 [style=invis]
+							master3 -> branch1 -> branch2 [dir=back]
+							rebase1 -> branch1 [dir=none; style=dashed]
+
+							master -> master4
+							HEAD -> rebase1
+							constant -> branch2
+
+							{rank = same; master1; master2; master3; master4; rebase1}
+							{rank = same; branch0; branch1; branch2}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-in-and-out" data-fragment-index="0" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+							branch0 [style=invis]
+							branch1 [shape=box; label="Commit\nfaab7c2"; style=dashed]
+							branch2 [shape=box; label="Commit\nd5e9466"; style=dashed]
+							rebase1 [shape=box; label="Commit\n7bc489a"; style=bold]
+							rebase2 [shape=box; label="Commit\n32c2d79"; style=bold]
+		
+							master [shape=plain]
+							constant [shape=plain; label="constant*"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 -> rebase1 -> rebase2 [dir=back]
+							master3 -> branch0 -> branch1 [style=invis]
+							master3 -> branch1 -> branch2 [dir=back]
+							rebase1 -> branch1 [dir=none; style=dashed]
+							rebase2 -> branch2 [dir=none; style=dashed]
+
+							master -> master4
+							HEAD -> rebase2
+							constant -> branch2
+
+							{rank = same; master1; master2; master3; master4; rebase1; rebase2}
+							{rank = same; branch0; branch1; branch2}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-in-and-out" data-fragment-index="1" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+							branch0 [style=invis]
+							branch1 [shape=box; label="Commit\nfaab7c2"; style=dashed]
+							branch2 [shape=box; label="Commit\nd5e9466"; style=dashed]
+							rebase1 [shape=box; label="Commit\n7bc489a"; style=bold]
+							rebase2 [shape=box; label="Commit\n32c2d79"; style=bold]
+		
+							master [shape=plain]
+							constant [shape=plain; label="constant*"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 -> rebase1 -> rebase2 [dir=back]
+							master3 -> branch0 -> branch1 [style=invis]
+							master3 -> branch1 -> branch2 [dir=back]
+
+							master -> master4
+							HEAD -> rebase2
+							constant -> rebase2
+
+							{rank = same; master1; master2; master3; master4; rebase1; rebase2}
+							{rank = same; branch0; branch1; branch2}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-in-and-out" data-fragment-index="2" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+							rebase1 [shape=box; label="Commit\n7bc489a"; style=bold]
+							rebase2 [shape=box; label="Commit\n32c2d79"; style=bold]
+		
+							master [shape=plain]
+							constant [shape=plain; label="constant*"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 -> rebase1 -> rebase2 [dir=back]
+
+							master -> master4
+							HEAD -> rebase2
+							constant -> rebase2
+
+							{rank = same; master1; master2; master3; master4; rebase1; rebase2}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-in-and-out" data-fragment-index="3" -->
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+							rebase1 [shape=box; label="Commit\n7bc489a"]
+							rebase2 [shape=box; label="Commit\n32c2d79"]
+							rebase3 [shape=box; label="Commit\n1594b24"; style=bold]
+		
+							master [shape=plain]
+							constant [shape=plain; label="constant*"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 -> rebase1 -> rebase2 -> rebase3 [dir=back]
+
+							master -> master4
+							HEAD -> rebase3
+							constant -> rebase3
+
+							{rank = same; master1; master2; master3; master4; rebase1; rebase2; rebase3}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align fragment step-in" data-fragment-index="4" -->
+
+						---
+						## Merge vs rebase
+
+						Rebase results in a cleaner history, for the price of rewriting it!
+
+						Avoid rebase on already pushed commits, as it may result in diverging histories if the deleted commits were already fetched by others.
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+							rebase1 [shape=box; label="Commit\n7bc489a"]
+							rebase2 [shape=box; label="Commit\n32c2d79"]
+							rebase3 [shape=box; label="Commit\n1594b24"; style=bold]
+		
+							master [shape=plain]
+							constant [shape=plain; label="constant*"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 -> rebase1 -> rebase2 -> rebase3 [dir=back]
+
+							master -> master4
+							HEAD -> rebase3
+							constant -> rebase3
+
+							{rank = same; master1; master2; master3; master4; rebase1; rebase2; rebase3}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align" -->
+
+						Good for `pull`, but avoid pulling after a local merge.
+
+						--
+						## Merge vs rebase
+
+						Merge always adds extra commit (except fast-forward), but it is non-destructive. 
+						The resulting graph shows the change history more realistically, but harder to follow.
+
+						```dot
+						digraph {
+							bgcolor=transparent;
+
+							master1 [shape=box; label="Commit\nfdf4b4d"]
+							master2 [shape=box; label="Commit\n60eb0d3"]
+							master3 [shape=box; label="Commit\n74e95f3"]
+							master4 [shape=box; label="Commit\n631a42b"]
+							branch0 [style=invis]
+							branch1 [shape=box; label="Commit\nfaab7c2"]
+							branch2 [shape=box; label="Commit\nd5e9466"]
+							branch3 [shape=box; label="Commit\n8c31cb7"]
+							branch4 [shape=box; label="Commit\nb3199dd"; style=bold]
+		
+							master [shape=plain]
+							constant [shape=plain, label="constant*"]
+							HEAD [shape=plain]
+
+							master1 -> master2 -> master3 -> master4 -> branch3 [dir=back]
+							master3 -> branch0 -> branch1 [style=invis]
+							master3 -> branch1 -> branch2 -> branch3 -> branch4 [dir=back]
+
+							master -> master4
+							HEAD -> branch4
+							constant -> branch4
+
+							{rank = same; master1; master2; master3; master4}
+							{rank = same; branch0; branch1; branch2; branch3; branch4}
+						}
+						```
+						<!--< data-graphviz="dot" class="center-align" -->
+
+						Good for merging in large changesets of many commits.
 
 						---
 						## Remotes
@@ -1383,7 +1751,7 @@
 						<!--< data-graphviz="dot" class="center-align fragment step-in" data-fragment-index="1" -->
 
 						---
-						## References
+						## Further reading
 
 						[Pro Git](https://git-scm.com/book/en/v2) book by Scott Chacon and Ben Straub (free)
 
@@ -1406,6 +1774,8 @@
 			// - https://github.com/hakimel/reveal.js#dependencies
 			Reveal.initialize({
 				history: true,
+				slideNumber: 'c/t',
+				showSlideNumber: 'speaker',
 				dependencies: [
 					{ src: 'plugin/markdown/marked.js' },
 					{ src: 'plugin/markdown/markdown.js' },
@@ -1414,7 +1784,6 @@
 					{ src: 'plugin/reveal-viz/viz.js' },
 					{ src: 'plugin/reveal-viz/lite.render.js' },
 					{ src: 'plugin/reveal-viz/reveal-viz.js' },
-					{ src: 'plugin/print-pdf/print-pdf.js', async: true },
 				]
 			});
 		</script>
