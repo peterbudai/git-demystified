@@ -192,15 +192,15 @@
 						--
 						## Object addresses
 
-						SHA1 hash of the contents. 
+						SHA1 hash of the contents.
 						
 						For commits:
 
 							$ git cat-file -p 60eb0d
 							tree f566009872bdd562f7c76e4220eeb1ae7b2406fd
 							parent fdf4b4da0d4d388b0276f0fde71b29e6470ec36f
-							author Péter Budai <budai@tresorit.com> 1549380900 +0100
-							committer Péter Budai <budai@tresorit.com> 1549383923 +0100
+							author Péter Budai <...> 1549380900 +0100
+							committer Péter Budai <...> 1549383923 +0100
 							
 							Added Hello World.
 
@@ -216,7 +216,7 @@
 
 						```
 						commit fdf4b4da0d4d388b0276f0fde71b29e6470ec36f (HEAD)
-						Author: Péter Budai <budai@tresorit.com>
+						Author: Péter Budai <...>
 						Date:   Tue Feb 5 15:23:58 2019 +0100
 
 							Added README.
@@ -251,7 +251,7 @@
 
 						```					
 						commit 60eb0d3ad8babf1b082844472fa9c027fc0eb552 (HEAD -> master)
-						Author: Péter Budai <budai@tresorit.com>
+						Author: Péter Budai <...>
 						Date:   Tue Feb 5 16:35:00 2019 +0100
 						
 							Added Hello World.
@@ -301,7 +301,7 @@
 						## Commit history
 						<!--^ class="columns-40-60" -->
 
-						Commits form a backward linked, linear history of the changes in the repository.
+						All commits have one or more parents: they form a backward-linked list of the changes in the repository.
 
 						```bash
 						$ git log --oneline d5e9466

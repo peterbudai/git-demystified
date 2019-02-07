@@ -21,4 +21,4 @@ Uses [Viz.js](http://viz-js.com/) to display commit graphs.
 
 [MIT licensed](LICENSE.md)
 
-Copyright (C) 2019 Péter Budai, https://peterbudai.eu
+Copyright (C) 2019 Péter Budai, https://peterbudai.eu/
