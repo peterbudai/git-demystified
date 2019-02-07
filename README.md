@@ -9,7 +9,7 @@ what is happening under the hood when I do complex operations with Git and reduc
 
 ### Online
 
-Navigate to the (GitHub pages)[https://peterbudai.github.io/git-demystified/] of this repository.
+Navigate to the GitHub Pages of this repository: https://peterbudai.github.io/git-demystified/
 
 ### Offline
 
